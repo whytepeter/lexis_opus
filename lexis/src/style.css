@@ -1,0 +1,375 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #0a0a0b;
+    --surface: #131315;
+    --surface2: #1a1a1e;
+    --surface3: #222228;
+    --border: #2a2a32;
+    --border2: #38383f;
+    --text: #f2ede2;
+    --text2: #bfbab0;
+    --text3: #6a6660;
+    --amber: #d4931a;
+    --amber2: #f0a820;
+    --amber-dim: rgba(212, 147, 26, 0.13);
+    --green: #4caf7d;
+    --green-dim: rgba(76, 175, 125, 0.13);
+    --red: #e06c75;
+    --red-dim: rgba(224, 108, 117, 0.13);
+    --blue: #61afef;
+    --blue-dim: rgba(97, 175, 239, 0.13);
+    --purple: #9b59b6;
+    --purple-dim: rgba(155, 89, 182, 0.13);
+  }
+
+  .light {
+    --bg: #e8e4dc;
+    --surface: #f4f1eb;
+    --surface2: #ede9e1;
+    --surface3: #e0dbd2;
+    --border: #cec9bf;
+    --border2: #bdb8ad;
+    --text: #141210;
+    --text2: #3d3a35;
+    --text3: #7a7670;
+    --amber: #b8780e;
+    --amber2: #c9860f;
+    --amber-dim: rgba(184, 120, 14, 0.11);
+    --green: #2e7d52;
+    --green-dim: rgba(46, 125, 82, 0.11);
+    --red: #c0392b;
+    --red-dim: rgba(192, 57, 43, 0.11);
+    --blue: #1565a8;
+    --blue-dim: rgba(21, 101, 168, 0.11);
+    --purple: #7d3c98;
+    --purple-dim: rgba(125, 60, 152, 0.11);
+  }
+
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Lato", sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border2);
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* ── Card ── */
+  .card {
+    @apply bg-surface border border-b1 rounded-[10px] p-6 mb-4;
+  }
+  .card:hover {
+    @apply border-b2;
+  }
+
+  /* ── Buttons ── */
+  .btn-amber {
+    @apply text-amber2 cursor-pointer border-none px-3.5 py-1.5 rounded-md text-xs font-bold tracking-wide transition-all;
+    background: var(--amber-dim);
+  }
+  .btn-amber:hover {
+    background: rgba(212, 147, 26, 0.2);
+  }
+
+  .btn-green {
+    @apply text-green cursor-pointer border-none px-3.5 py-1.5 rounded-md text-xs font-bold tracking-wide transition-all;
+    background: var(--green-dim);
+  }
+  .btn-green:hover {
+    background: rgba(76, 175, 125, 0.2);
+  }
+
+  .btn-blue {
+    @apply text-blue cursor-pointer border-none px-3.5 py-1.5 rounded-md text-xs font-bold tracking-wide transition-all;
+    background: var(--blue-dim);
+  }
+  .btn-blue:hover {
+    background: rgba(97, 175, 239, 0.2);
+  }
+
+  .btn-purple {
+    @apply text-purple cursor-pointer border-none px-3.5 py-1.5 rounded-md text-xs font-bold tracking-wide transition-all;
+    background: var(--purple-dim);
+  }
+  .btn-purple:hover {
+    background: rgba(155, 89, 182, 0.2);
+  }
+
+  .btn-save {
+    @apply bg-amber text-bg border-none py-2.5 px-6 rounded-lg font-mono text-xs font-medium tracking-widest cursor-pointer transition-all mt-3.5;
+  }
+  .btn-save:hover {
+    @apply bg-amber2;
+  }
+
+  /* ── Nav item ── */
+  .nav-item {
+    @apply flex items-center gap-2.5 px-3 py-2.5 rounded-md cursor-pointer text-[13.5px] text-t2 font-normal transition-all mb-0.5 border-none bg-transparent w-full text-left;
+  }
+  .nav-item:hover {
+    @apply bg-s2 text-t1;
+  }
+  .nav-item.active {
+    @apply text-amber2;
+    background: var(--amber-dim);
+  }
+
+  /* ── Filter button ── */
+  .filter-btn {
+    @apply font-mono text-[11px] tracking-wide uppercase px-3.5 py-1.5 rounded-full border border-b1 bg-transparent text-t2 cursor-pointer transition-all;
+  }
+  .filter-btn:hover {
+    @apply border-b2 text-t1;
+  }
+  .filter-btn.active {
+    color: var(--amber2);
+    border-color: var(--amber);
+    background: var(--amber-dim);
+  }
+
+  /* ── Open button (small inline) ── */
+  .open-btn {
+    @apply text-[10px] text-blue border-none py-1 px-2.5 rounded-[5px] cursor-pointer font-mono tracking-wide transition-all no-underline inline-flex items-center gap-1;
+    background: var(--blue-dim);
+  }
+  .open-btn:hover {
+    background: rgba(97, 175, 239, 0.2);
+  }
+
+  /* ── Check button ── */
+  .check-btn {
+    @apply w-7 h-7 rounded-full border border-b2 bg-transparent cursor-pointer flex items-center justify-center text-xs transition-all text-t3;
+  }
+  .check-btn:hover {
+    @apply border-green text-green;
+  }
+  .check-btn.checked {
+    border-color: var(--green);
+    color: var(--green);
+    background: var(--green-dim);
+  }
+  .check-btn.half {
+    border-color: var(--amber);
+    color: var(--amber2);
+    background: var(--amber-dim);
+  }
+
+  /* ── Section title ── */
+  .section-title {
+    @apply font-mono text-[10px] tracking-[3px] uppercase text-t3 mb-3.5 pb-2 border-b border-b1;
+  }
+
+  /* ── Level tags ── */
+  .level-tag {
+    @apply font-mono text-[9px] tracking-[1.5px] uppercase px-2 py-0.5 rounded-full font-medium;
+  }
+  .level-starter {
+    background: rgba(76, 175, 125, 0.15);
+    @apply text-green;
+  }
+  .level-building {
+    background: rgba(212, 147, 26, 0.15);
+    @apply text-amber2;
+  }
+  .level-stretch {
+    background: rgba(224, 108, 117, 0.15);
+    @apply text-red;
+  }
+
+  /* ── Word chip ── */
+  .word-chip {
+    @apply bg-s3 border border-b2 text-t1 text-xs px-2.5 py-1 rounded-[5px] inline-flex items-center gap-1.5 font-mono;
+  }
+
+  /* ── Input ── */
+  .field-input {
+    @apply bg-s3 border border-b1 rounded-md text-t1 font-mono text-base px-3 py-1.5 outline-none transition-colors;
+  }
+  .field-input:focus {
+    @apply border-amber;
+  }
+  .field-input::placeholder {
+    @apply text-t3;
+  }
+
+  /* ── Header icon button ── */
+  .header-icon-btn {
+    @apply bg-s2 border border-b1 text-t2 rounded-md w-8 h-8 flex items-center justify-center cursor-pointer text-[15px] transition-all flex-shrink-0;
+  }
+  .header-icon-btn:hover {
+    @apply bg-s3 text-t1 border-b2;
+  }
+  .header-icon-btn.active {
+    @apply text-amber2 border-amber;
+    background: var(--amber-dim);
+  }
+
+  /* ── Toast ── */
+  .toast {
+    @apply fixed bottom-8 right-8 bg-s3 border border-b2 text-t1 px-5 py-3 rounded-lg font-mono text-xs z-[999]
+           opacity-0 translate-y-5 transition-all pointer-events-none;
+  }
+  .toast.show {
+    @apply opacity-100 translate-y-0;
+  }
+  .toast.green {
+    @apply border-l-4 border-l-green;
+  }
+  .toast.amber {
+    @apply border-l-4 border-l-amber;
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    @apply fixed inset-0 z-[300] hidden items-center justify-center p-5;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open {
+    @apply flex;
+  }
+
+  .modal-box {
+    @apply bg-surface border border-b2 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8 relative;
+  }
+
+  /* ── Study overlay ── */
+  .study-overlay {
+    @apply fixed inset-0 z-[500] hidden items-center justify-center p-5;
+    background: rgba(0, 0, 0, 0.87);
+    backdrop-filter: blur(6px);
+  }
+  .study-overlay.open {
+    @apply flex;
+  }
+
+  .study-modal {
+    @apply bg-surface border border-b2 rounded-[18px] w-full max-w-lg p-9 relative;
+  }
+
+  /* ── Info tip ── */
+  .info-tip {
+    @apply bg-s2 border border-b1 border-l-[3px] border-l-amber rounded-lg px-4 py-3.5 mb-5 relative;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    @apply w-[220px] flex-shrink-0 bg-surface border-r border-b1 flex flex-col;
+  }
+
+  /* ── Bottom tabs ── */
+  .bottom-tabs {
+    @apply hidden fixed bottom-0 left-0 right-0 bg-surface border-t border-b1 z-[250] flex-row items-stretch;
+    height: calc(60px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* ── Task card accent bars ── */
+  .task-card {
+    @apply bg-surface border border-b1 rounded-[10px] p-5 relative overflow-hidden transition-colors;
+  }
+  .task-card::before {
+    content: "";
+    @apply absolute top-0 left-0 w-[3px] h-full;
+  }
+  .task-card.focus-read::before {
+    @apply bg-blue;
+  }
+  .task-card.focus-write::before {
+    @apply bg-amber;
+  }
+  .task-card.focus-review::before {
+    @apply bg-green;
+  }
+  .task-card.focus-vocab::before {
+    @apply bg-red;
+  }
+}
+
+@layer utilities {
+  .amber-dim {
+    background-color: var(--amber-dim);
+  }
+  .green-dim {
+    background-color: var(--green-dim);
+  }
+  .red-dim {
+    background-color: var(--red-dim);
+  }
+  .blue-dim {
+    background-color: var(--blue-dim);
+  }
+  .purple-dim {
+    background-color: var(--purple-dim);
+  }
+
+  @keyframes spin-once {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .spin-once {
+    animation: spin-once 0.5s ease;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      @apply hidden;
+    }
+    .bottom-tabs {
+      @apply flex;
+    }
+    .page-content {
+      padding-bottom: calc(76px + env(safe-area-inset-bottom));
+    }
+    .toast {
+      @apply bottom-[72px] right-4 left-4 text-center;
+    }
+
+    .modal-overlay {
+      @apply items-stretch p-0;
+    }
+    .modal-box {
+      @apply rounded-none border-none w-full;
+      max-height: 100dvh;
+      height: 100dvh;
+      padding: calc(60px + env(safe-area-inset-top)) 18px
+        calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .study-overlay {
+      @apply items-stretch p-0;
+    }
+    .study-modal {
+      @apply rounded-none max-w-full flex flex-col justify-center;
+      height: 100dvh;
+      padding: 40px 20px calc(40px + env(safe-area-inset-bottom));
+    }
+  }
+}
