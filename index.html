@@ -13,7 +13,7 @@
     />
     <meta name="apple-mobile-web-app-title" content="Lexis" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="theme-color" id="theme-color-meta" content="#0a0a0b" />
+    <meta name="theme-color" content="#0a0a0b" />
     <meta
       name="description"
       content="Track your English learning — articles, essays, vocabulary and progress."
@@ -21,12 +21,1405 @@
     <title>Lexis — English Tracker</title>
     <link rel="manifest" id="pwa-manifest" />
     <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0a0b'/><text y='68' x='50' text-anchor='middle' font-size='56' font-family='Georgia,serif' fill='%23d4931a'>L</text></svg>"
+    />
+    <link
       href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Lato:wght@300;400;700&display=swap"
       rel="stylesheet"
     />
-    <script type="module" src="/src/main.ts"></script>
+    <link rel="stylesheet" href="styles/main.css" />
   </head>
   <body>
-    <div id="app"></div>
+    <!-- ── FAB (mobile top-right) ── -->
+    <div class="fab-pill">
+      <button class="fab-btn" id="fab-theme-btn" title="Toggle theme">☀</button>
+      <div class="fab-divider"></div>
+      <button class="fab-btn" id="fab-refresh-btn" title="Refresh">↺</button>
+    </div>
+
+    <div class="shell">
+      <!-- ── Sidebar (desktop) ── -->
+      <nav class="sidebar">
+        <div class="sidebar-logo">
+          <div class="logo-mark">Lexis</div>
+          <div class="logo-sub">Track · Learn · Write</div>
+        </div>
+        <div class="nav-section">
+          <div class="nav-label">Navigate</div>
+          <button class="nav-item active" data-goto="today">
+            <span class="nav-icon">◈</span><span>Today</span>
+          </button>
+          <button class="nav-item" data-goto="articles">
+            <span class="nav-icon">◎</span><span>Articles</span
+            ><span class="nav-badge" id="unread-badge">0</span>
+          </button>
+          <button class="nav-item" data-goto="essays">
+            <span class="nav-icon">◻</span><span>Essays</span>
+          </button>
+          <button class="nav-item" data-goto="fiction">
+            <span class="nav-icon">◉</span><span>Fiction</span>
+          </button>
+          <button class="nav-item" data-goto="vocab">
+            <span class="nav-icon">◆</span><span>Vocab</span>
+          </button>
+          <button class="nav-item" data-goto="progress">
+            <span class="nav-icon">◈</span><span>Progress</span>
+          </button>
+        </div>
+        <div class="sidebar-footer">
+          <div class="streak-display" style="margin-bottom: 6px">
+            <span id="streak-num">0</span> day streak 🔥
+          </div>
+          <div
+            style="
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 10px;
+              color: var(--text3);
+              margin-bottom: 12px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            "
+          >
+            <span>🧊 <span id="streak-freeze-count">0</span> freeze(s)</span>
+            <button
+              id="use-freeze-btn"
+              style="
+                background: none;
+                border: none;
+                color: var(--blue);
+                font-size: 10px;
+                font-family: 'IBM Plex Mono', monospace;
+                cursor: pointer;
+                padding: 0;
+              "
+            >
+              Use
+            </button>
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button
+              class="icon-action-btn"
+              id="theme-toggle-btn"
+              title="Toggle theme"
+            >
+              ☀
+            </button>
+            <button class="icon-action-btn" id="refresh-btn" title="Refresh">
+              ↺
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- ── Bottom tabs (mobile) ── -->
+      <nav class="bottom-tabs">
+        <button class="bottom-tab active" id="bt-today" data-goto="today">
+          <span class="bt-icon">◈</span><span>Today</span>
+        </button>
+        <button class="bottom-tab" id="bt-articles" data-goto="articles">
+          <span class="bt-icon">◎</span><span>Articles</span
+          ><span
+            class="bt-badge"
+            id="bt-unread-badge"
+            style="display: none"
+          ></span>
+        </button>
+        <button class="bottom-tab" id="bt-essays" data-goto="essays">
+          <span class="bt-icon">◻</span><span>Essays</span>
+        </button>
+        <button class="bottom-tab" id="bt-fiction" data-goto="fiction">
+          <span class="bt-icon">◉</span><span>Fiction</span>
+        </button>
+        <button class="bottom-tab" id="bt-more">
+          <span class="bt-icon">⋯</span><span>More</span>
+        </button>
+      </nav>
+
+      <!-- ── More sheet (mobile) ── -->
+      <div class="more-sheet-overlay" id="more-sheet-overlay"></div>
+      <div class="more-sheet" id="more-sheet">
+        <div class="more-sheet-handle"></div>
+        <div class="more-sheet-title">More sections</div>
+        <button class="more-sheet-item" data-goto="vocab">
+          <div class="more-sheet-icon more-icon-vocab">◆</div>
+          <div class="more-sheet-info">
+            <div class="more-sheet-label">Vocabulary</div>
+            <div class="more-sheet-desc">
+              Study your logged words · Track mastery
+            </div>
+          </div>
+          <div class="more-sheet-arrow">›</div>
+        </button>
+        <button class="more-sheet-item" data-goto="progress">
+          <div class="more-sheet-icon more-icon-progress">◈</div>
+          <div class="more-sheet-info">
+            <div class="more-sheet-label">Progress</div>
+            <div class="more-sheet-desc">
+              84-day map · Stats · Activity overview
+            </div>
+          </div>
+          <div class="more-sheet-arrow">›</div>
+        </button>
+      </div>
+
+      <!-- ── Main content ── -->
+      <main class="main">
+        <!-- TODAY -->
+        <div id="view-today" class="view active">
+          <div class="page-header">
+            <div class="page-header-row">
+              <div>
+                <div class="today-date" id="today-date-label"></div>
+                <div class="today-day-title" id="today-day-title">
+                  Good morning.
+                </div>
+                <div class="week-badge" id="today-week-badge">
+                  ⬡ Week 1 · Day 1
+                </div>
+              </div>
+              <div class="page-header-actions">
+                <button
+                  class="header-icon-btn"
+                  id="help-btn-today"
+                  title="How to use Today"
+                >
+                  ?
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="page-content">
+            <div class="week-strip" id="week-strip"></div>
+            <div class="info-tip" id="tip-today">
+              <div class="info-tip-title">How to use Today</div>
+              <p>
+                Each day has a focus — vocabulary, writing, structure, feedback,
+                or review. Complete the suggested task, then tap
+                <strong style="color: var(--text)"
+                  >"Mark today complete"</strong
+                >
+                to build your streak.
+              </p>
+              <button class="info-tip-dismiss" data-dismiss-tip="tip-today">
+                ✕
+              </button>
+            </div>
+            <div class="section-title">Today's Tasks</div>
+            <div class="today-grid" id="today-tasks"></div>
+            <button class="complete-day-btn" id="complete-day-btn">
+              ✓ Mark today complete
+            </button>
+          </div>
+        </div>
+
+        <!-- ARTICLES -->
+        <div id="view-articles" class="view">
+          <div class="page-header">
+            <div class="page-header-row">
+              <div>
+                <div class="page-title">Reading List</div>
+                <div class="page-sub">
+                  Mark articles as read · Log new vocabulary words
+                </div>
+              </div>
+              <div class="page-header-actions">
+                <button
+                  class="header-icon-btn"
+                  id="search-icon-btn"
+                  title="Search"
+                >
+                  ⌕
+                </button>
+                <button
+                  class="header-icon-btn"
+                  id="help-btn-articles"
+                  title="How to use Articles"
+                >
+                  ?
+                </button>
+              </div>
+            </div>
+            <div class="search-bar-wrap" id="search-bar-wrap">
+              <div class="search-input-wrap">
+                <span class="search-icon-inner">⌕</span>
+                <input
+                  class="search-input"
+                  id="article-search-input"
+                  placeholder="Search articles by title or topic..."
+                />
+                <button
+                  class="search-clear-btn"
+                  id="search-clear-btn"
+                  style="display: none"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="page-content">
+            <div class="info-tip" id="tip-articles">
+              <div class="info-tip-title">How to read these articles</div>
+              <p>
+                Start with
+                <strong style="color: var(--text)">⚡ Short reads</strong> or
+                <strong style="color: var(--text)">🌍 Broad interest</strong>.
+                Read once for general understanding, then again slowly. Tap the
+                circle to mark progress — ½ halfway, ✓ done. Find 2–3 new words,
+                tap the article row to log them.
+              </p>
+              <button class="info-tip-dismiss" data-dismiss-tip="tip-articles">
+                ✕
+              </button>
+            </div>
+            <div class="filter-row" id="article-filter-row">
+              <button class="filter-btn active" data-filter-articles="all">
+                All
+              </button>
+              <button class="filter-btn" data-filter-articles="starter">
+                Starter
+              </button>
+              <button class="filter-btn" data-filter-articles="building">
+                Building
+              </button>
+              <button class="filter-btn" data-filter-articles="stretch">
+                Stretch
+              </button>
+              <button class="filter-btn" data-filter-articles="unread">
+                Unread
+              </button>
+              <button class="filter-btn" data-filter-articles="read">
+                Read
+              </button>
+              <button class="filter-btn" data-filter-articles="short">
+                ⚡ Short reads
+              </button>
+              <button class="filter-btn" data-filter-articles="broad">
+                🌍 Broad interest
+              </button>
+              <button class="filter-btn" data-filter-articles="books">
+                📚 Book summaries
+              </button>
+              <button class="filter-btn" data-filter-articles="happiness">
+                😊 Happiness
+              </button>
+              <button class="filter-btn" data-filter-articles="health">
+                💪 Health
+              </button>
+              <button class="filter-btn" data-filter-articles="productivity">
+                ⚡ Productivity
+              </button>
+              <button class="filter-btn" data-filter-articles="money">
+                💰 Money
+              </button>
+              <button class="filter-btn" data-filter-articles="politics">
+                🏛 Politics
+              </button>
+              <button class="filter-btn" data-filter-articles="culture">
+                🌍 Culture &amp; Life
+              </button>
+              <button class="filter-btn" data-filter-articles="ideas">
+                💡 Ideas
+              </button>
+            </div>
+            <div id="article-list"></div>
+          </div>
+        </div>
+
+        <!-- ESSAYS -->
+        <div id="view-essays" class="view">
+          <div class="page-header">
+            <div class="page-header-row">
+              <div>
+                <div class="page-title">Essay Journal</div>
+                <div class="page-sub">
+                  Write your essays · Paste Claude's corrections side by side
+                </div>
+              </div>
+              <div class="page-header-actions">
+                <button
+                  class="header-icon-btn"
+                  id="help-btn-essays"
+                  title="How to use Essays"
+                >
+                  ?
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="page-content">
+            <div class="info-tip" id="tip-essays">
+              <div class="info-tip-title">How to use the essay journal</div>
+              <p>
+                Essays run Week 1–12. Tap any essay to open it, write your
+                draft, then paste Claude's corrected version. Use
+                <strong style="color: var(--text)">Side by Side</strong> to
+                compare every change.
+              </p>
+              <button class="info-tip-dismiss" data-dismiss-tip="tip-essays">
+                ✕
+              </button>
+            </div>
+            <div id="essay-list"></div>
+          </div>
+        </div>
+
+        <!-- FICTION -->
+        <div id="view-fiction" class="view">
+          <div class="page-header">
+            <div class="page-header-row">
+              <div>
+                <div class="page-title">Fiction Library</div>
+                <div class="page-sub">
+                  Short stories · Novels · Scripts · Classic fiction
+                </div>
+              </div>
+              <div class="page-header-actions">
+                <button
+                  class="header-icon-btn"
+                  id="fiction-search-icon-btn"
+                  title="Search fiction"
+                >
+                  ⌕
+                </button>
+                <button
+                  class="header-icon-btn"
+                  id="help-btn-fiction"
+                  title="How to use Fiction"
+                >
+                  ?
+                </button>
+              </div>
+            </div>
+            <div class="search-bar-wrap" id="fiction-search-bar-wrap">
+              <div class="search-input-wrap">
+                <span class="search-icon-inner">⌕</span>
+                <input
+                  class="search-input"
+                  id="fiction-search-input"
+                  placeholder="Search by title, author or type..."
+                />
+                <button
+                  class="search-clear-btn"
+                  id="fiction-search-clear-btn"
+                  style="display: none"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="page-content">
+            <div class="info-tip" id="tip-fiction">
+              <div class="info-tip-title">How to read fiction</div>
+              <p>
+                Fiction teaches rhythm, tone, dialogue, and emotion. Don't worry
+                about every word — read for the story first. Log words that feel
+                important. Start with short stories before tackling novels.
+              </p>
+              <button class="info-tip-dismiss" data-dismiss-tip="tip-fiction">
+                ✕
+              </button>
+            </div>
+            <div class="filter-row fiction-filter-row" id="fiction-filter-row">
+              <button class="filter-btn active" data-filter-fiction="all">
+                All
+              </button>
+              <button class="filter-btn" data-filter-fiction="story">
+                Short Stories
+              </button>
+              <button class="filter-btn" data-filter-fiction="novel">
+                Novels
+              </button>
+              <button class="filter-btn" data-filter-fiction="script">
+                Scripts
+              </button>
+              <button class="filter-btn" data-filter-fiction="beginner">
+                Beginner
+              </button>
+              <button class="filter-btn" data-filter-fiction="intermediate">
+                Intermediate
+              </button>
+              <button class="filter-btn" data-filter-fiction="advanced">
+                Advanced
+              </button>
+              <button class="filter-btn" data-filter-fiction="reading">
+                📖 Reading
+              </button>
+              <button class="filter-btn" data-filter-fiction="finished">
+                ✓ Finished
+              </button>
+            </div>
+            <div id="fiction-list" style="margin-top: 16px"></div>
+          </div>
+        </div>
+
+        <!-- VOCAB -->
+        <div id="view-vocab" class="view">
+          <div class="page-header">
+            <div class="page-header-row">
+              <div>
+                <div class="page-title">Vocabulary</div>
+                <div class="page-sub">
+                  Study your logged words · Track mastery
+                </div>
+              </div>
+              <div class="page-header-actions">
+                <button
+                  class="header-icon-btn"
+                  id="help-btn-vocab"
+                  title="How to use Vocab"
+                >
+                  ?
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="page-content">
+            <div class="info-tip" id="tip-vocab">
+              <div class="info-tip-title">How the study mode works</div>
+              <p>
+                Choose how many words to study. Each card shows a word — try to
+                recall the meaning, then
+                <strong style="color: var(--text)">tap to flip</strong> and see
+                up to 3 definitions. Rate yourself:
+                <strong style="color: var(--blue)">Easy</strong>,
+                <strong style="color: var(--green)">Got it</strong>,
+                <strong style="color: var(--amber2)">Fuzzy</strong>, or
+                <strong style="color: var(--red)">Blank</strong>. Get a word
+                right 3 sessions in a row →
+                <strong style="color: var(--green)">Mastered</strong>.
+              </p>
+              <button class="info-tip-dismiss" data-dismiss-tip="tip-vocab">
+                ✕
+              </button>
+            </div>
+            <div
+              style="
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 12px;
+                margin-bottom: 24px;
+              "
+              id="vocab-stats-grid"
+            ></div>
+            <div class="card vocab-start-card" id="vocab-start-card">
+              <div style="font-size: 40px; margin-bottom: 14px">🧠</div>
+              <div
+                style="
+                  font-family: 'Lora', serif;
+                  font-size: 20px;
+                  font-weight: 600;
+                  margin-bottom: 8px;
+                "
+              >
+                Study your words
+              </div>
+              <div
+                style="
+                  font-size: 13px;
+                  color: var(--text2);
+                  margin-bottom: 24px;
+                  line-height: 1.6;
+                "
+              >
+                Tap to flip each card and see up to 3 dictionary definitions +
+                example sentences.<br />Rate difficulty — hard words come back
+                sooner.
+              </div>
+              <button
+                class="start-session-btn"
+                style="max-width: 280px; margin: 0 auto"
+                id="open-study-btn"
+              >
+                Start a session →
+              </button>
+              <div
+                id="no-words-msg"
+                style="
+                  display: none;
+                  font-size: 13px;
+                  color: var(--text3);
+                  font-family: 'IBM Plex Mono', monospace;
+                  margin-top: 16px;
+                "
+              >
+                Log words from articles first to start studying.
+              </div>
+            </div>
+            <div class="card" style="margin-top: 0; overflow: hidden">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 16px;
+                "
+              >
+                <div class="section-title" style="margin-bottom: 0">
+                  All Words
+                  <span
+                    id="vocab-total-count"
+                    style="
+                      font-weight: 400;
+                      color: var(--text3);
+                      font-size: 10px;
+                    "
+                  ></span>
+                </div>
+                <div style="display: flex; gap: 6px">
+                  <button
+                    class="filter-btn active"
+                    data-filter-vocab="all"
+                    style="font-size: 10px; padding: 4px 10px"
+                  >
+                    All
+                  </button>
+                  <button
+                    class="filter-btn"
+                    data-filter-vocab="new"
+                    style="font-size: 10px; padding: 4px 10px"
+                  >
+                    New
+                  </button>
+                  <button
+                    class="filter-btn"
+                    data-filter-vocab="learning"
+                    style="font-size: 10px; padding: 4px 10px"
+                  >
+                    Learning
+                  </button>
+                  <button
+                    class="filter-btn"
+                    data-filter-vocab="fuzzy"
+                    style="font-size: 10px; padding: 4px 10px"
+                  >
+                    Fuzzy
+                  </button>
+                  <button
+                    class="filter-btn"
+                    data-filter-vocab="mastered"
+                    style="font-size: 10px; padding: 4px 10px"
+                  >
+                    Mastered
+                  </button>
+                </div>
+              </div>
+              <div id="vocab-table-wrap"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROGRESS -->
+        <div id="view-progress" class="view">
+          <div class="page-header">
+            <div class="page-header-row">
+              <div>
+                <div class="page-title">Your Progress</div>
+                <div class="page-sub">A snapshot of how far you've come</div>
+              </div>
+              <div class="page-header-actions">
+                <button
+                  class="header-icon-btn"
+                  id="settings-btn"
+                  title="Settings"
+                >
+                  ⚙
+                </button>
+                <button
+                  class="header-icon-btn"
+                  id="help-btn-progress"
+                  title="Reading your progress"
+                >
+                  ?
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="page-content">
+            <div class="info-tip" id="tip-progress">
+              <div class="info-tip-title">Reading your progress</div>
+              <p>
+                Stats update in real time as you mark days, read articles, log
+                words, and write essays. The 84-day map shows every day — amber
+                is today, green is done, red is missed.
+              </p>
+              <button class="info-tip-dismiss" data-dismiss-tip="tip-progress">
+                ✕
+              </button>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-num" id="stat-days">0</div>
+                <div class="stat-label">Days Done</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-articles">0</div>
+                <div class="stat-label">Articles Read</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-words">0</div>
+                <div class="stat-label">Words Learnt</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-essays">0</div>
+                <div class="stat-label">Essays Written</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-fiction">0</div>
+                <div class="stat-label">Fiction Read</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-num" id="stat-mastered">0</div>
+                <div class="stat-label">Words Mastered</div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom: 16px">
+              <div class="section-title">12-Week Plan Progress</div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-label">
+                  Overall completion <span id="prog-pct">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    id="prog-fill"
+                    style="width: 0%"
+                  ></div>
+                </div>
+              </div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-label">
+                  Articles read <span id="art-pct">0</span>
+                </div>
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    id="art-fill"
+                    style="
+                      width: 0%;
+                      background: linear-gradient(90deg, #61afef, #88c9ff);
+                    "
+                  ></div>
+                </div>
+              </div>
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-label">
+                  Essays submitted <span id="ess-pct">0 / 12</span>
+                </div>
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    id="ess-fill"
+                    style="
+                      width: 0%;
+                      background: linear-gradient(90deg, #4caf7d, #7acf9e);
+                    "
+                  ></div>
+                </div>
+              </div>
+              <div class="progress-bar-wrap" style="margin-bottom: 0">
+                <div class="progress-bar-label">
+                  Fiction finished <span id="fic-pct">0</span>
+                </div>
+                <div class="progress-track">
+                  <div
+                    class="progress-fill"
+                    id="fic-fill"
+                    style="
+                      width: 0%;
+                      background: linear-gradient(90deg, #9b59b6, #c39bd3);
+                    "
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom: 16px">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 16px;
+                "
+              >
+                <div class="section-title" style="margin-bottom: 0">
+                  This Week
+                </div>
+                <span
+                  style="
+                    font-family: 'IBM Plex Mono', monospace;
+                    font-size: 10px;
+                    color: var(--text3);
+                  "
+                  >🧊 <span id="prog-freezes">0</span> freeze(s) available</span
+                >
+              </div>
+              <div class="week-progress-grid" id="this-week-map"></div>
+              <div
+                style="
+                  font-size: 12px;
+                  color: var(--text2);
+                  font-family: 'IBM Plex Mono', monospace;
+                "
+                id="week-summary-text"
+              ></div>
+            </div>
+            <div class="card" style="margin-bottom: 16px">
+              <div class="section-title">84-Day Activity Map</div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(7, 1fr);
+                  gap: 6px;
+                "
+                id="activity-map"
+              ></div>
+              <div
+                style="
+                  font-size: 11px;
+                  color: var(--text3);
+                  font-family: 'IBM Plex Mono', monospace;
+                  margin-top: 6px;
+                "
+              >
+                <span style="color: var(--green)">■</span> Done &nbsp;<span
+                  style="color: var(--amber)"
+                  >■</span
+                >
+                Today &nbsp;<span style="color: var(--red)">■</span> Missed
+                &nbsp;<span style="color: var(--border2)">■</span> Upcoming
+              </div>
+            </div>
+            <div class="card">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 16px;
+                "
+              >
+                <div class="section-title" style="margin-bottom: 0">
+                  Vocabulary Bank
+                  <span
+                    id="vocab-count"
+                    style="
+                      font-size: 12px;
+                      color: var(--text3);
+                      font-family: 'IBM Plex Mono', monospace;
+                      font-weight: 400;
+                      margin-left: 6px;
+                    "
+                  ></span>
+                </div>
+                <button
+                  class="open-btn"
+                  id="study-words-btn"
+                  style="display: none"
+                >
+                  ⚡ Study
+                </button>
+              </div>
+              <div class="vocab-cloud" id="vocab-cloud"></div>
+              <div
+                style="
+                  margin-top: 12px;
+                  font-size: 12px;
+                  color: var(--text3);
+                  font-family: 'IBM Plex Mono', monospace;
+                "
+              >
+                Words collected from articles you've read
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ── Study overlay ── -->
+    <div class="study-overlay" id="study-overlay">
+      <div class="study-modal" id="study-modal-inner">
+        <button class="study-close" id="study-close-btn">✕</button>
+        <div id="study-setup" class="session-setup">
+          <div style="font-size: 44px; margin-bottom: 16px">🧠</div>
+          <h2>Study Session</h2>
+          <p id="study-setup-desc">
+            Choose how many words to study this session.
+          </p>
+          <div class="size-options" id="size-options"></div>
+          <button class="start-session-btn" id="start-session-btn" disabled>
+            Start →
+          </button>
+        </div>
+        <div id="study-session" style="display: none">
+          <div class="study-counter">
+            <span id="sc-label">Word 1 of 10</span>
+            <span id="sc-streak" style="color: var(--amber2)"></span>
+          </div>
+          <div class="study-progress-track">
+            <div class="study-progress-fill" id="spf"></div>
+          </div>
+          <div class="study-card-scene">
+            <div class="study-card" id="study-card">
+              <div class="study-card-front">
+                <div class="study-word" id="sc-word"></div>
+                <div class="study-tap-hint">tap to reveal</div>
+              </div>
+              <div class="study-card-back" id="sc-back-face">
+                <div id="sc-loading" class="study-loading-dots">• • •</div>
+                <div id="sc-meanings" style="width: 100%; display: none"></div>
+                <div
+                  class="study-source"
+                  id="sc-source"
+                  style="display: none"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div class="study-actions" id="study-actions">
+            <button class="study-btn s-blank" data-rate="blank">
+              ✗<span class="rate-label">Blank</span>
+            </button>
+            <button class="study-btn s-fuzzy" data-rate="fuzzy">
+              ~<span class="rate-label">Fuzzy</span>
+            </button>
+            <button class="study-btn s-got" data-rate="got">
+              ✓<span class="rate-label">Got it</span>
+            </button>
+            <button class="study-btn s-easy" data-rate="easy">
+              ★<span class="rate-label">Easy</span>
+            </button>
+          </div>
+        </div>
+        <div id="study-done" class="session-done" style="display: none">
+          <div class="done-emoji" id="done-emoji">🎉</div>
+          <h2 id="done-title">Session complete!</h2>
+          <div class="score-line" id="done-desc"></div>
+          <div class="score-breakdown" id="score-breakdown"></div>
+          <div class="session-done-btns">
+            <button
+              class="study-btn s-blank"
+              id="retry-btn"
+              style="display: none"
+            >
+              ↺ Retry missed
+            </button>
+            <button class="save-btn" id="study-done-close-btn" style="flex: 1">
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Essay modal ── -->
+    <div class="modal-overlay" id="essay-modal">
+      <div class="modal">
+        <button class="modal-close" data-close-modal="essay-modal">✕</button>
+        <div class="modal-week" id="modal-week"></div>
+        <div class="modal-title" id="modal-title"></div>
+        <div class="modal-type" id="modal-type"></div>
+        <div class="modal-prompt" id="modal-prompt"></div>
+        <div class="modal-tabs">
+          <button class="modal-tab active" data-tab="draft">My Draft</button>
+          <button class="modal-tab" data-tab="corrected">
+            Claude's Correction
+          </button>
+          <button class="modal-tab" data-tab="compare">Side by Side</button>
+        </div>
+        <div class="modal-tab-content active" id="tab-draft">
+          <div class="col-label amber">Your essay</div>
+          <textarea
+            class="essay-textarea"
+            id="draft-textarea"
+            placeholder="Write your essay here..."
+          ></textarea>
+          <button class="save-btn" id="save-draft-btn">Save Draft</button>
+        </div>
+        <div class="modal-tab-content" id="tab-corrected">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 8px;
+            "
+          >
+            <div class="col-label green" style="margin-bottom: 0">
+              Claude's corrected version
+            </div>
+            <button class="open-btn" id="copy-essay-prompt-btn">
+              ⎘ Copy prompt for Claude
+            </button>
+          </div>
+          <div
+            style="
+              font-size: 12px;
+              color: var(--text3);
+              font-family: 'IBM Plex Mono', monospace;
+              margin-bottom: 12px;
+            "
+          >
+            Copy the prompt above, paste it into Claude with your essay.
+          </div>
+          <textarea
+            class="essay-textarea"
+            id="corrected-textarea"
+            placeholder="Paste Claude's corrected version here..."
+          ></textarea>
+          <button class="save-btn" id="save-correction-btn">
+            Save Correction
+          </button>
+        </div>
+        <div class="modal-tab-content" id="tab-compare">
+          <div class="two-col">
+            <div>
+              <div class="col-label amber">Your Draft</div>
+              <div
+                id="compare-draft"
+                style="
+                  background: var(--surface2);
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  padding: 16px;
+                  font-size: 13.5px;
+                  line-height: 1.75;
+                  min-height: 200px;
+                  color: var(--text2);
+                  white-space: pre-wrap;
+                "
+              ></div>
+            </div>
+            <div>
+              <div class="col-label green">Claude's Correction</div>
+              <div
+                id="compare-corrected"
+                style="
+                  background: var(--surface2);
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  padding: 16px;
+                  font-size: 13.5px;
+                  line-height: 1.75;
+                  min-height: 200px;
+                  color: var(--text2);
+                  white-space: pre-wrap;
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Reset / settings modal ── -->
+    <div class="modal-overlay" id="reset-modal">
+      <div class="modal" style="max-width: 420px">
+        <button class="modal-close" data-close-modal="reset-modal">✕</button>
+        <div class="modal-week">Settings</div>
+        <div class="modal-title" style="font-size: 18px; margin-bottom: 20px">
+          Plan &amp; Data
+        </div>
+        <div style="margin-bottom: 24px">
+          <div
+            style="
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 10px;
+              letter-spacing: 2px;
+              text-transform: uppercase;
+              color: var(--amber);
+              margin-bottom: 8px;
+            "
+          >
+            Change start date
+          </div>
+          <div
+            style="font-size: 13px; color: var(--text2); margin-bottom: 12px"
+          >
+            Move when your 12-week plan begins. Completed days reset.
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input
+              type="date"
+              id="new-start-date"
+              style="
+                flex: 1;
+                background: var(--surface2);
+                border: 1px solid var(--border2);
+                border-radius: 8px;
+                padding: 9px 12px;
+                color: var(--text);
+                font-size: 14px;
+                font-family: 'Lato', sans-serif;
+                outline: none;
+              "
+            />
+            <button class="save-btn" id="apply-start-date-btn">Apply</button>
+          </div>
+        </div>
+        <div style="padding-top: 20px; border-top: 1px solid var(--border)">
+          <div
+            style="
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 10px;
+              letter-spacing: 2px;
+              text-transform: uppercase;
+              color: var(--red);
+              margin-bottom: 8px;
+            "
+          >
+            Danger zone
+          </div>
+          <div
+            style="font-size: 13px; color: var(--text2); margin-bottom: 12px"
+          >
+            Completely reset all data. This cannot be undone.
+          </div>
+          <button
+            id="full-reset-btn"
+            style="
+              background: var(--red-dim);
+              border: 1px solid var(--red);
+              color: var(--red);
+              border-radius: 8px;
+              padding: 9px 18px;
+              font-size: 13px;
+              cursor: pointer;
+              font-family: 'IBM Plex Mono', monospace;
+            "
+          >
+            Reset everything
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- ── Bootstrap ── -->
+    <script type="module">
+      import {
+        loadState,
+        updateStreak,
+        changeStartDate,
+        resetState,
+        getStartDate,
+      } from "./state/store.js";
+      import { loadTheme, toggleTheme } from "./utils/theme.js";
+      import {
+        toggleTip,
+        dismissTip,
+        restoreDismissedTips,
+      } from "./utils/tips.js";
+      import { toast } from "./utils/toast.js";
+
+      import { renderToday, handleUseStreakFreeze } from "./views/today.js";
+      import {
+        renderArticles,
+        filterArticles,
+        toggleSearch,
+        onSearchInput,
+        clearSearch,
+      } from "./views/articles.js";
+      import {
+        renderEssays,
+        openEssayModal,
+        switchTab,
+        saveDraft,
+        saveCorrection,
+        copyEssayPrompt,
+      } from "./views/essays.js";
+      import {
+        renderFiction,
+        filterFiction,
+        toggleFictionSearch,
+        onFictionSearchInput,
+        clearFictionSearch,
+      } from "./views/fiction.js";
+      import { renderVocab, filterVocab } from "./views/vocab.js";
+      import { renderProgress } from "./views/progress.js";
+      import {
+        openStudySetup,
+        startSession,
+        flipStudyCard,
+        rateWord,
+        retryFuzzy,
+        closeStudy,
+      } from "./study/session.js";
+
+      // ── View router (exposed globally for today.js task buttons) ──
+      const VIEW_RENDERERS = {
+        today: renderToday,
+        articles: renderArticles,
+        essays: renderEssays,
+        fiction: renderFiction,
+        vocab: renderVocab,
+        progress: renderProgress,
+      };
+      window._showView = showView;
+
+      function showView(name) {
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        document.getElementById(`view-${name}`).classList.add("active");
+        document
+          .querySelectorAll(`.nav-item[data-goto="${name}"]`)
+          .forEach((n) => n.classList.add("active"));
+
+        document
+          .querySelectorAll(".bottom-tab")
+          .forEach((t) => t.classList.remove("active"));
+        const bt = document.getElementById(`bt-${name}`);
+        if (bt) bt.classList.add("active");
+        else document.getElementById("bt-more")?.classList.add("active");
+
+        closeMoreSheet();
+        VIEW_RENDERERS[name]?.();
+      }
+
+      // ── More sheet ──
+      function openMoreSheet() {
+        document.getElementById("more-sheet-overlay").classList.add("open");
+        document.getElementById("more-sheet").classList.add("open");
+        document.getElementById("bt-more").classList.add("active");
+      }
+      function closeMoreSheet() {
+        document.getElementById("more-sheet-overlay").classList.remove("open");
+        document.getElementById("more-sheet").classList.remove("open");
+      }
+
+      // ── Global delegated click handler ──
+      document.addEventListener("click", (e) => {
+        // Nav items & bottom tabs
+        const gotoBtn = e.target.closest("[data-goto]");
+        if (gotoBtn && !gotoBtn.closest(".more-sheet")) {
+          showView(gotoBtn.dataset.goto);
+          return;
+        }
+        if (gotoBtn?.closest(".more-sheet")) {
+          showView(gotoBtn.dataset.goto);
+          return;
+        }
+
+        // More sheet toggle
+        if (e.target.closest("#bt-more")) {
+          openMoreSheet();
+          return;
+        }
+        if (e.target.closest("#more-sheet-overlay")) {
+          closeMoreSheet();
+          return;
+        }
+
+        // Modal close buttons
+        const closeBtn = e.target.closest("[data-close-modal]");
+        if (closeBtn) {
+          document
+            .getElementById(closeBtn.dataset.closeModal)
+            .classList.remove("open");
+          return;
+        }
+
+        // Click on modal overlay itself
+        if (e.target.classList.contains("modal-overlay")) {
+          e.target.classList.remove("open");
+          return;
+        }
+
+        // Dismiss tips
+        const dismissBtn = e.target.closest("[data-dismiss-tip]");
+        if (dismissBtn) {
+          dismissTip(dismissBtn.dataset.dismissTip);
+          return;
+        }
+
+        // Help (toggle tip) buttons
+        const helpBtn = e.target.closest(".header-icon-btn[id^='help-btn-']");
+        if (helpBtn) {
+          const suffix = helpBtn.id.replace("help-btn-", "");
+          toggleTip(`tip-${suffix}`, helpBtn.id);
+          return;
+        }
+
+        // Article filters
+        const afBtn = e.target.closest("[data-filter-articles]");
+        if (afBtn) {
+          filterArticles(afBtn.dataset.filterArticles, afBtn);
+          return;
+        }
+
+        // Fiction filters
+        const ffBtn = e.target.closest("[data-filter-fiction]");
+        if (ffBtn) {
+          filterFiction(ffBtn.dataset.filterFiction, ffBtn);
+          return;
+        }
+
+        // Vocab filters
+        const vfBtn = e.target.closest("[data-filter-vocab]");
+        if (vfBtn) {
+          filterVocab(vfBtn.dataset.filterVocab, vfBtn);
+          return;
+        }
+
+        // Essay modal tabs
+        const tabBtn = e.target.closest(".modal-tab[data-tab]");
+        if (tabBtn) {
+          switchTab(tabBtn.dataset.tab);
+          return;
+        }
+
+        // Study overlay click-outside
+        if (e.target.id === "study-overlay") {
+          closeStudy();
+          return;
+        }
+
+        // Study card flip
+        if (e.target.closest("#study-card")) {
+          flipStudyCard();
+          return;
+        }
+
+        // Study rate buttons
+        const rateBtn = e.target.closest("[data-rate]");
+        if (rateBtn) {
+          rateWord(rateBtn.dataset.rate);
+          return;
+        }
+
+        // Specific buttons
+        const id = e.target.closest("button, a")?.id;
+        switch (id) {
+          case "fab-theme-btn":
+          case "theme-toggle-btn":
+            toggleTheme();
+            break;
+          case "fab-refresh-btn":
+          case "refresh-btn":
+            setTimeout(() => location.reload(), 300);
+            break;
+          case "use-freeze-btn":
+            handleUseStreakFreeze();
+            break;
+          case "search-icon-btn":
+            toggleSearch();
+            break;
+          case "search-clear-btn":
+            clearSearch();
+            break;
+          case "fiction-search-icon-btn":
+            toggleFictionSearch();
+            break;
+          case "fiction-search-clear-btn":
+            clearFictionSearch();
+            break;
+          case "open-study-btn":
+          case "study-words-btn":
+            openStudySetup();
+            break;
+          case "start-session-btn":
+            startSession();
+            break;
+          case "study-close-btn":
+            closeStudy();
+            break;
+          case "study-done-close-btn":
+            closeStudy();
+            break;
+          case "retry-btn":
+            retryFuzzy();
+            break;
+          case "save-draft-btn":
+            saveDraft();
+            break;
+          case "save-correction-btn":
+            saveCorrection();
+            break;
+          case "copy-essay-prompt-btn":
+            copyEssayPrompt();
+            break;
+          case "settings-btn":
+            document.getElementById("reset-modal").classList.add("open");
+            document.getElementById("new-start-date").value = getStartDate();
+            break;
+          case "apply-start-date-btn":
+            _applyStartDate();
+            break;
+          case "full-reset-btn":
+            _fullReset();
+            break;
+        }
+      });
+
+      // Search inputs (oninput → delegated)
+      document
+        .getElementById("article-search-input")
+        .addEventListener("input", onSearchInput);
+      document
+        .getElementById("fiction-search-input")
+        .addEventListener("input", onFictionSearchInput);
+
+      function _applyStartDate() {
+        const val = document.getElementById("new-start-date").value;
+        if (!val) {
+          toast("Please pick a date.", "amber");
+          return;
+        }
+        changeStartDate(val);
+        document.getElementById("reset-modal").classList.remove("open");
+        renderToday();
+        renderProgress();
+        toast("Start date updated.", "green");
+      }
+
+      function _fullReset() {
+        if (!confirm("This will delete ALL your progress. Are you sure?"))
+          return;
+        resetState();
+        location.reload();
+      }
+
+      // ── PWA manifest ──
+      const manifest = {
+        name: "Lexis — English Tracker",
+        short_name: "Lexis",
+        description: "Track your English learning.",
+        start_url: ".",
+        display: "standalone",
+        background_color: "#0a0a0b",
+        theme_color: "#0a0a0b",
+        orientation: "portrait-primary",
+        icons: [
+          {
+            src: "data:image/svg+xml,...",
+            sizes: "512x512",
+            type: "image/svg+xml",
+            purpose: "any maskable",
+          },
+        ],
+      };
+      const mb = new Blob([JSON.stringify(manifest)], {
+        type: "application/json",
+      });
+      document
+        .getElementById("pwa-manifest")
+        .setAttribute("href", URL.createObjectURL(mb));
+
+      // ── Init ──
+      loadState();
+      loadTheme();
+      updateStreak();
+      renderToday();
+      restoreDismissedTips();
+    </script>
   </body>
 </html>
