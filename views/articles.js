@@ -28,7 +28,7 @@ const FILTER_MAP = {
   money: (a) => a.id.startsWith("m"),
   politics: (a) => a.id.startsWith("pol"),
   culture: (a) => a.id.startsWith("cl"),
-  ideas: (a) => a.id.startsWith("id"),
+  ideas: (a) => a.id.startsWith("i"),
 };
 
 export function renderArticles() {
